@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700" role="img" aria-label="redact-service architecture">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#60a5fa"/>
+    </marker>
+    <clipPath id="clip">
+      <rect x="0" y="0" width="1200" height="700" rx="0"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#clip)">
+    <rect x="0" y="0" width="1200" height="700" fill="#f8fafc"/>
+    <circle cx="1150" cy="20" r="200" fill="#3b82f6" fill-opacity="0.06"/>
+    <circle cx="60" cy="690" r="180" fill="#8b5cf6" fill-opacity="0.06"/>
+  </g>
+
+  <text x="40" y="48" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="26" font-weight="700" fill="#0f172a">redact-service · 架构总览</text>
+  <text x="40" y="74" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#64748b">内网敏感信息自动打码服务 —— 端到端处理流水线 (End-to-End Pipeline)</text>
+
+  <rect x="978" y="28" width="182" height="34" rx="17" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="1069" y="50" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1d4ed8">Offline · 纯内网</text>
+
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <!-- 1 输入 -->
+    <rect x="40" y="92" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="100" width="6" height="52" rx="3" fill="#0284c7"/>
+    <circle cx="84" cy="126" r="20" fill="#0284c7"/>
+    <text x="84" y="133" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">1</text>
+    <text x="122" y="122" font-size="17" font-weight="700" fill="#0f172a">输入 / Input</text>
+    <text x="122" y="144" font-size="13.5" fill="#475569">Word (docx/xls) · Excel (xlsx) · PDF（文字型 / 扫描型） · 图片 (png/jpg)</text>
+
+    <line x1="84" y1="161" x2="84" y2="173" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- 2 分发 -->
+    <rect x="40" y="174" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="182" width="6" height="52" rx="3" fill="#4f46e5"/>
+    <circle cx="84" cy="208" r="20" fill="#4f46e5"/>
+    <text x="84" y="215" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">2</text>
+    <text x="122" y="204" font-size="17" font-weight="700" fill="#0f172a">分发 / Dispatch</text>
+    <text x="122" y="226" font-size="13.5" fill="#475569">魔数判型 · 拒绝宏 / 加密 / 压缩 / 超限 · 旧格式转换（.doc / .xls → 新格式）</text>
+
+    <line x1="84" y1="243" x2="84" y2="255" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- 3 检测引擎 -->
+    <rect x="40" y="256" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="264" width="6" height="52" rx="3" fill="#7c3aed"/>
+    <circle cx="84" cy="290" r="20" fill="#7c3aed"/>
+    <text x="84" y="297" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">3</text>
+    <text x="122" y="286" font-size="17" font-weight="700" fill="#0f172a">检测引擎 / Core</text>
+    <text x="122" y="308" font-size="13.5" fill="#475569">词典 (Aho-Corasick) &gt; 规则 (正则) &gt; 上下文 &gt; NER (HanLP/spaCy)；合并重叠 Span，保留更长命中</text>
+
+    <line x1="84" y1="325" x2="84" y2="337" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- 4 处理器 -->
+    <rect x="40" y="338" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="346" width="6" height="52" rx="3" fill="#2563eb"/>
+    <circle cx="84" cy="372" r="20" fill="#2563eb"/>
+    <text x="84" y="379" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">4</text>
+    <text x="122" y="368" font-size="17" font-weight="700" fill="#0f172a">处理器 / Handlers</text>
+    <text x="122" y="390" font-size="13.5" fill="#475569">docx (zipfile+lxml) · xlsx (openpyxl) · pdf (PyMuPDF 真删除) · image (rapidocr 涂黑)</text>
+
+    <line x1="84" y1="407" x2="84" y2="419" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- 5 复核 -->
+    <rect x="40" y="420" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="428" width="6" height="52" rx="3" fill="#0891b2"/>
+    <circle cx="84" cy="454" r="20" fill="#0891b2"/>
+    <text x="84" y="461" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">5</text>
+    <text x="122" y="450" font-size="17" font-weight="700" fill="#0f172a">复核 / Verify</text>
+    <text x="122" y="472" font-size="13.5" fill="#475569">重新抽取文本 / 再做 OCR，残留高置信命中 → needs_review</text>
+
+    <line x1="84" y1="489" x2="84" y2="501" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- 6 服务 -->
+    <rect x="40" y="502" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="510" width="6" height="52" rx="3" fill="#1d4ed8"/>
+    <circle cx="84" cy="536" r="20" fill="#1d4ed8"/>
+    <text x="84" y="543" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">6</text>
+    <text x="122" y="532" font-size="17" font-weight="700" fill="#0f172a">服务 / API</text>
+    <text x="122" y="554" font-size="13.5" fill="#475569">FastAPI 接口 + Celery 异步 + Fernet 加密隔离存储 + SQLite 审计</text>
+
+    <line x1="84" y1="571" x2="84" y2="583" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- 7 输出 -->
+    <rect x="40" y="584" width="1120" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="592" width="6" height="52" rx="3" fill="#059669"/>
+    <circle cx="84" cy="618" r="20" fill="#059669"/>
+    <text x="84" y="625" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">7</text>
+    <text x="122" y="614" font-size="17" font-weight="700" fill="#0f172a">输出 / Output</text>
+    <text x="122" y="636" font-size="13.5" fill="#475569">done → 脱敏文件 · needs_review → 人工复核 · failed → 重传</text>
+  </g>
+
+  <!-- 图例 -->
+  <rect x="40" y="664" width="1120" height="30" rx="15" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="58" y="684" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#1e40af">脱敏占位符 / Placeholders:</text>
+
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" fill="#1e3a8a">
+    <rect x="300" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="337" y="683" text-anchor="middle">[姓名]</text>
+    <rect x="382" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="419" y="683" text-anchor="middle">[公司]</text>
+    <rect x="464" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="501" y="683" text-anchor="middle">[地址]</text>
+    <rect x="546" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="583" y="683" text-anchor="middle">[手机号]</text>
+    <rect x="628" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="665" y="683" text-anchor="middle">[银行卡号]</text>
+    <rect x="710" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="747" y="683" text-anchor="middle">[证件号]</text>
+    <rect x="792" y="669" width="74" height="20" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="829" y="683" text-anchor="middle">[邮箱]</text>
+  </g>
+</svg>

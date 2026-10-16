@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-label="redact-service banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.55" stop-color="#132043"/>
+      <stop offset="1" stop-color="#231a4d"/>
+    </linearGradient>
+    <radialGradient id="glowBlue" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowViolet" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity="0.40"/>
+      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 H0 V40" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <clipPath id="clip">
+      <rect x="0" y="0" width="1280" height="320" rx="24"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#clip)">
+    <rect x="0" y="0" width="1280" height="320" fill="url(#bg)"/>
+    <rect x="0" y="0" width="1280" height="320" fill="url(#grid)"/>
+    <circle cx="1090" cy="30" r="260" fill="url(#glowBlue)"/>
+    <circle cx="140" cy="320" r="240" fill="url(#glowViolet)"/>
+  </g>
+
+  <text x="72" y="130" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff" letter-spacing="-1.5">redact-service</text>
+  <text x="72" y="180" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#cbd5e1">内网敏感信息自动打码服务</text>
+  <text x="72" y="212" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#94a3b8">Offline PII Redaction Service · Word / Excel / PDF / Image</text>
+
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#e2e8f0">
+    <rect x="72" y="248" width="142" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.18"/>
+    <text x="143" y="270" text-anchor="middle">中文 / English</text>
+
+    <rect x="226" y="248" width="98" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.18"/>
+    <text x="275" y="270" text-anchor="middle">纯内网</text>
+
+    <rect x="336" y="248" width="152" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.18"/>
+    <text x="412" y="270" text-anchor="middle">99%+ Recall</text>
+  </g>
+
+  <g>
+    <rect x="876" y="56" width="304" height="224" rx="18" fill="#000000" fill-opacity="0.30"/>
+    <rect x="876" y="48" width="304" height="224" rx="18" fill="#f8fafc"/>
+    <rect x="902" y="78" width="122" height="12" rx="6" fill="#94a3b8"/>
+    <rect x="902" y="112" width="252" height="12" rx="6" fill="#cbd5e1"/>
+    <rect x="902" y="140" width="170" height="12" rx="6" fill="#0f172a"/>
+    <rect x="902" y="168" width="212" height="12" rx="6" fill="#cbd5e1"/>
+    <rect x="902" y="196" width="140" height="12" rx="6" fill="#0f172a"/>
+    <rect x="902" y="224" width="184" height="12" rx="6" fill="#e2e8f0"/>
+  </g>
+
+  <g>
+    <circle cx="1176" cy="264" r="39" fill="#0f172a"/>
+    <circle cx="1176" cy="264" r="34" fill="url(#shield)"/>
+    <path d="M1160 264 L1171 276 L1193 250" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

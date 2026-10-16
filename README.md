@@ -1,7 +1,24 @@
-# redact-service 使用说明
+<div align="center">
+  <img src="assets/banner.svg" alt="redact-service banner" width="860"/>
+</div>
+
+# redact-service
+
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Celery](https://img.shields.io/badge/Celery-Redis-37814A?logo=celery&logoColor=white)](https://docs.celeryq.dev/)
+[![Docker](https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
+[![tests](https://img.shields.io/badge/tests-70%20passed-brightgreen)](tests/)
+[![recall](https://img.shields.io/badge/recall-100%25-success)](reports/eval.md)
+[![云依赖](https://img.shields.io/badge/cloud-none%20%C2%B7%20offline-critical)](#)
+[![平台](https://img.shields.io/badge/OS-Windows%20%7C%20Linux%20%7C%20Docker-informational)](#)
 
 纯内网、不上云的上传敏感信息自动打码服务。中英文；支持 Word / Excel / PDF / 图片。
 设计为独立 Python 服务，主项目通过 HTTP 调用。
+
+## 架构
+
+![架构图](assets/architecture.svg)
 
 ## 目录
 
