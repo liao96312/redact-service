@@ -1,0 +1,55 @@
+# T5.1 docker-compose：api + worker + redis
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      REDACT_CONFIG: /app/config.yaml
+      REDACT_SYNC_MODE: "false"
+      REDACT_KEY: ${REDACT_KEY:?set REDACT_KEY in .env}
+    ports:
+      - "8080:8080"
+    volumes:
+      - redact-data:/data
+      - ./dicts:/app/dicts
+      - ./models:/opt/models:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    logging: &log
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  worker:
+    build: .
+    restart: unless-stopped
+    command: celery -A api.tasks.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      REDACT_CONFIG: /app/config.yaml
+      REDACT_SYNC_MODE: "false"
+      REDACT_KEY: ${REDACT_KEY:?set REDACT_KEY in .env}
+    volumes:
+      - redact-data:/data
+      - ./dicts:/app/dicts
+      - ./models:/opt/models:ro
+    # T5.2 内存限制按模型实测调整（HanLP+OCR CPU 峰值）
+    mem_limit: 4g
+    depends_on:
+      redis:
+        condition: service_healthy
+    logging: *log
+
+volumes:
+  redact-data:
+  redis-data:

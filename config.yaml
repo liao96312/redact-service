@@ -1,0 +1,76 @@
+# redact-service 配置（禁止硬编码，全部集中在此）
+service:
+  host: "0.0.0.0"
+  port: 8080
+  name: "redact-service"
+  sync_mode: true        # true=接口进程内同步处理（开发/单机）；false=走 Celery
+  max_upload_mb: 50
+
+paths:
+  # 模型目录（内网预置）；留空表示使用库默认缓存
+  model_dir: "/opt/models"
+  dict_file: "dicts/customers.txt"
+  quarantine_dir: "/data/quarantine"
+  clean_dir: "/data/clean"
+  audit_db: "/data/audit.db"
+
+# 占位符（脱敏后替换文本）
+placeholders:
+  PERSON: "[姓名]"
+  ORG: "[公司]"
+  ADDRESS: "[地址]"
+  PHONE: "[手机号]"
+  BANK_CARD: "[银行卡号]"
+  ID_CARD: "[证件号]"
+  EMAIL: "[邮箱]"
+  DEFAULT: "[敏感信息]"
+
+# 识别器优先级（数值越大越优先）：词典 > 规则 > 上下文 > NER
+priority:
+  dict: 4
+  rule: 3
+  ctx: 2
+  ner: 1
+
+score:
+  rule: 0.9
+  ctx: 0.85
+  dict: 0.95
+  ner: 0.6
+
+# 处理限制
+limits:
+  max_file_mb: 50
+  max_pages: 200
+  file_timeout_sec: 300
+  min_han_char_ratio: 0.30      # 汉字占比阈值，超过用 HanLP
+  ocr_line_conf_threshold: 0.80 # 行置信度低于此值 -> needs_review
+  verify_score_threshold: 0.60  # 复核时残留命中 score 不低于此值 -> needs_review
+  min_dict_word_len: 2
+  min_fragment_chars: 2         # 命中片段短于此长度时涂整行
+  pdf_scanned_text_len: 20      # 页面文本长度低于此值且含图片 -> 扫描页
+  ocr_dpi: 200
+
+ocr:
+  # 轻量视觉模型优先：rapidocr（PP-OCR ONNX 版，体积小、纯 CPU）
+  # 可选 paddleocr（更重，需 Paddle 框架）
+  engine: "rapidocr"     # rapidocr | paddleocr
+  lang: "ch"             # 中英文
+  use_gpu: false
+  detect_use_ner: true   # 图片逐行检测启用 NER（捕获英文公司/人名等）
+
+ner:
+  hanlp_home_env: "HANLP_HOME"
+  spacy_model: "en_core_web_sm"
+
+storage:
+  key_env: "REDACT_KEY"        # Fernet 密钥来源，仅环境变量
+  retention_days: 7
+
+redis:
+  broker: "redis://redis:6379/0"
+  backend: "redis://redis:6379/1"
+
+celery:
+  # 并发数 = CPU 核数的一半（OCR 吃内存）
+  cpu_halved: true

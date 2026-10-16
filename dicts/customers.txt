@@ -1,0 +1,9 @@
+# 客户词典：一行一个词条。支持 "词" 或 "词<TAB>类型"。
+# 类型：PERSON / ORG / ADDRESS（默认 PERSON）。
+# 由主项目导出；本文件为示例数据，请替换为真实词典。
+张三	PERSON
+李四	PERSON
+王五	PERSON
+北京示例科技股份有限公司	ORG
+示例科技有限公司	ORG
+Sample Technology Inc.	ORG

@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# 密钥：绝不入库
+.redact_key
+*.key
+.env
+
+# 生成的测试数据与运行时数据
+testdata/
+data/
+wheels/
+models/
+reports/
+
+# 编辑器
+.vscode/
+.idea/

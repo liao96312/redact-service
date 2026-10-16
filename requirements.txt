@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+python-multipart
+celery
+redis
+PyMuPDF
+lxml
+openpyxl
+pyahocorasick
+hanlp
+spacy
+# 轻量视觉模型（PP-OCR ONNX 版），替代重量级 paddleocr
+rapidocr-onnxruntime
+Faker
+cryptography
+pytest
