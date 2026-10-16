@@ -12,6 +12,7 @@
 [![recall](https://img.shields.io/badge/recall-100%25-success)](reports/eval.md)
 [![云依赖](https://img.shields.io/badge/cloud-none%20%C2%B7%20offline-critical)](#)
 [![平台](https://img.shields.io/badge/OS-Windows%20%7C%20Linux%20%7C%20Docker-informational)](#)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 纯内网、不上云的上传敏感信息自动打码服务。中英文；支持 Word / Excel / PDF / 图片。
 设计为独立 Python 服务，主项目通过 HTTP 调用。
@@ -124,3 +125,9 @@ docker compose up -d --build
 如需在真实样本上进一步降误报/漏报，可按清单用 vLLM/llama.cpp 部署 Qwen 小模型，
 仅对"NER 低分命中"和"verify 疑似遗漏"片段二判，提示词要求只输出 JSON 敏感片段列表，
 原文不得离开内网。
+
+## 许可证
+
+本项目以 [Apache License 2.0](LICENSE) 发布，版权归 2026 liao96312 所有。
+第三方依赖及其许可见 [NOTICE](NOTICE)。
+
