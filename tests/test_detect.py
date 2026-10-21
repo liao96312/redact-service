@@ -1,13 +1,17 @@
-"""T1.7 检测引擎单元测试（>=60 条）。
+"""T1.7 检测引擎单元测试。
 
 覆盖：带空格/横线手机号、座机、400、国际号码、16/19 位银行卡、
 Luhn 不通过的 16 位数字、订单号与日期（不应误命中）、中英文公司、
 跨行地址、「户名：」后的姓名、纯英文段落、中英混排。
+
+另含真实图纸语料回归用例（分隔符不能跨行、图纸尺寸不能被当电话、
+NER 噪声过滤、竖排表格标签取值）。
 """
 import pytest
 
-from core.detect import detect
+from core.detect import detect, merge
 from core.rules import id18_ok, luhn_ok
+from core.span import Span
 
 
 def types(text):
@@ -19,7 +23,10 @@ def hits(text, typ):
 
 
 def assert_hit(text, typ):
-    assert any(typ == s.type for s in detect(text)), f"expected {typ} in {text!r}, got {[(s.type, text[s.start:s.end]) for s in detect(text)]}"
+    assert any(typ == s.type for s in detect(text)), (
+        f"expected {typ} in {text!r}, "
+        f"got {[(s.type, text[s.start:s.end]) for s in detect(text)]}"
+    )
 
 
 def assert_miss(text, typ):
@@ -104,8 +111,6 @@ DATE_MISS = [
 @pytest.mark.parametrize("s", DATE_MISS)
 def test_date_order_negative(s):
     assert_miss(s, "BANK_CARD")
-    # 日期不应被识别为电话
-    assert_miss(s.replace("日期：", ""), "PHONE") if False else None
 
 
 # ---------------------------------------------------------------- 身份证
@@ -240,3 +245,75 @@ def test_luhn():
 def test_id18():
     assert id18_ok("11010519491231002X")
     assert not id18_ok("110105194912310021")
+
+
+# ================================================================
+# 真实图纸语料回归
+# ================================================================
+def test_phone_not_across_lines():
+    """PDF 抽文后尺寸数字竖排，不能被 \\s 连成 400 电话（已修复的真实 bug）。"""
+    text = "地柜平面图\n400\n400\n400\n2320\n2400\n2000"
+    assert_miss(text, "PHONE")
+
+
+def test_dimension_numbers_not_person():
+    text = "抽屉(深300)\n18\n764\n18\n400\n18\n764\n18\n2000"
+    assert not [s for s in detect(text) if s.type in ("PERSON", "ORG") and s.source == "ner"]
+
+
+def test_uppercase_abbrev_not_org():
+    """PDF / TEL / DTC 这类全大写缩写不应被当成公司。"""
+    for s in ("PDF", "TEL", "DTC", "ATTN", "QTY"):
+        assert_miss(f"格式 {s} 说明", "ORG")
+
+
+def test_time_label_not_person():
+    assert_miss("下午2:49 回复", "PERSON")
+
+
+def test_vertical_table_person():
+    """工作证/下单页脚：标签一行、值换行，多人并列。"""
+    text = "职位\n销售\n设计\n跟单\n姓名\n江莉晴\n张铭鉴\n潘嘉惠\n电话\n13923273821\n13924866575"
+    persons = hits(text, "PERSON")
+    assert "江莉晴" in persons
+    assert "张铭鉴" in persons
+    phones = hits(text, "PHONE")
+    assert any("13923273821" in p for p in phones)
+
+
+def test_company_header_not_whole_column():
+    """表头含「公司」时，不能把整列任意文本都替换。"""
+    from handlers.xlsx_h import _looks_like
+
+    assert _looks_like("Acme Trading Ltd.", "ORG")
+    assert not _looks_like("Y105", "ORG")
+    assert not _looks_like("1.8m", "ORG")
+
+
+def test_formula_cell_ref_not_entity():
+    """=G20*F20 不应被判成公司名（真实报价单误报）。"""
+    from handlers.xlsx_h import _formula_skeleton
+
+    skeleton = _formula_skeleton("=G20*F20")
+    assert not detect(skeleton.strip()) or all(s.source != "ner" for s in detect(skeleton))
+    assert not [s for s in detect(_formula_skeleton("=SUM(F19:F21)")) if s.score >= 0.9]
+
+
+def test_merge_prefers_longer():
+    spans = [Span(0, 4, "PERSON", 0.6, "ner"), Span(0, 6, "ORG", 0.9, "rule")]
+    kept = merge(spans)
+    assert len(kept) == 1 and kept[0].type == "ORG"
+
+
+def test_merge_prefers_priority_on_same_length():
+    spans = [Span(0, 4, "PERSON", 0.6, "ner"), Span(0, 4, "PERSON", 0.95, "dict")]
+    kept = merge(spans)
+    assert len(kept) == 1 and kept[0].source == "dict"
+
+
+def test_path_span():
+    from core.detect import detect_paths
+
+    text = r"P:\快盘3\客户资料\出口部客户资料\Jennie\Juan & Dana\图纸"
+    spans = detect_paths(text)
+    assert spans and spans[0].start == 0

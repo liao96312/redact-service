@@ -10,9 +10,13 @@ paths:
   # 模型目录（内网预置）；留空表示使用库默认缓存
   model_dir: "/opt/models"
   dict_file: "dicts/customers.txt"
+  # 数据目录：绝对路径；不可写时自动回落到项目内 .data/
+  # Windows 本地跑请改成 D:/redact-data 之类，或用 REDACT_DATA_HOME 覆盖
   quarantine_dir: "/data/quarantine"
   clean_dir: "/data/clean"
   audit_db: "/data/audit.db"
+  # 临时工作目录（不再依赖系统 TEMP）；留空用项目内 .work/
+  work_dir: ""
 
 # 占位符（脱敏后替换文本）
 placeholders:
@@ -44,12 +48,20 @@ limits:
   max_pages: 200
   file_timeout_sec: 300
   min_han_char_ratio: 0.30      # 汉字占比阈值，超过用 HanLP
-  ocr_line_conf_threshold: 0.80 # 行置信度低于此值 -> needs_review
+  ocr_line_conf_threshold: 0.80 # 行置信度低于此值 -> needs_review（仅对有实际内容的行）
   verify_score_threshold: 0.60  # 复核时残留命中 score 不低于此值 -> needs_review
   min_dict_word_len: 2
   min_fragment_chars: 2         # 命中片段短于此长度时涂整行
-  pdf_scanned_text_len: 20      # 页面文本长度低于此值且含图片 -> 扫描页
+  pdf_scanned_text_len: 20      # 页面文本长度低于此值且图片覆盖率高 -> 扫描页
+  pdf_image_cover_ratio: 0.55   # 图片占页面面积比例阈值
+  pdf_ocr_fallback: true        # 文字页无命中时，再 OCR 一次兜底（产品图/截图）
+  pdf_max_ocr_pages: 200        # 单份 PDF 最多 OCR 页数（控制耗时）
   ocr_dpi: 200
+  image_box_pad_px: 2
+  xlsx_header_rows: 5
+  ner_segment_chars: 800        # NER 分段推理长度
+  isolate_process: true         # true=处理在常驻工作进程池中执行（可超时杀死）
+  worker_processes: 2           # 工作进程池大小（OCR 吃内存，按机器调）
 
 ocr:
   # 轻量视觉模型优先：rapidocr（PP-OCR ONNX 版，体积小、纯 CPU）
@@ -58,6 +70,13 @@ ocr:
   lang: "ch"             # 中英文
   use_gpu: false
   detect_use_ner: true   # 图片逐行检测启用 NER（捕获英文公司/人名等）
+  word_box: true         # 使用逐字框精确落框（中英混排必需）
+  max_side: 3000         # OCR 前把长边缩到此值以内
+
+# 旧格式转换（.doc/.xls/.et）：auto = 先 soffice，再 Office/WPS COM
+convert:
+  backend: "auto"        # auto | soffice | msoffice | wps | none
+  soffice_path: ""
 
 ner:
   hanlp_home_env: "HANLP_HOME"
@@ -66,6 +85,7 @@ ner:
 storage:
   key_env: "REDACT_KEY"        # Fernet 密钥来源，仅环境变量
   retention_days: 7
+  keep_original: true          # 处理完是否保留加密原件（批处理可设 false）
 
 redis:
   broker: "redis://redis:6379/0"
@@ -74,3 +94,12 @@ redis:
 celery:
   # 并发数 = CPU 核数的一半（OCR 吃内存）
   cpu_halved: true
+
+# 批处理（tools/batch_redact.py）
+batch:
+  # 压缩包内不再递归展开的嵌套层数
+  max_nested_depth: 2
+  # 单次批处理最多处理的文件数（0=不限）
+  max_files: 0
+  # 只处理这些扩展名（留空=全部可识别类型）
+  include_exts: []

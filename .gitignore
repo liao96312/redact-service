@@ -19,3 +19,8 @@ reports/
 # 编辑器
 .vscode/
 .idea/
+
+# 运行时工作区与日志
+.work/
+tests/.runtime/
+*.log
